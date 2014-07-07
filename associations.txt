@@ -1,0 +1,76 @@
+Use foreign_key on both models when the foreign key (tree_id) on the many table is not the original name of one table.  
+
+class OrangeTree < AR::Base                    class Orange < AR::Base
+    has_many :oranges, foreign_key: tree           belongs_to :orange_tree, foreign_key: tree
+end                                            end
+
+------------------                           ---------------
+|  orange_trees  |----------\                |   oranges   |
+|----------------|           \               |-------------|
+| id             |            \              | id          |
+|----------------|             \             |-------------|
+| age            |              \            | diameter    |
+|----------------|               \           |-------------|
+| height         |                -----------| tree_id     |
+|----------------|                           |-------------|
+
+
+============================================================================================================
+
+Use class_name when you do not want use the original name of a table in your model.   
+
+class OrangeTree < AR::Base                       class Orange < AR::Base
+    has_many :fruits, class_name: "Oranges"           belongs_to :orange_tree
+end                                               end
+
+------------------                              -----------------
+|  orange_trees  |-------------\                |   oranges      |
+|----------------|              \               |----------------|
+| id             |               \              | id             |
+|----------------|                \             |----------------|
+| age            |                 \            | diameter       |
+|----------------|                  \           |----------------|
+| height         |                   -----------| orange_tree_id |
+|----------------|                              |----------------|
+
+
+
+============================================================================================================
+
+Use foreign_key and class_name on the many model (Orange) when the belongs_to table name (:tree) is not the original name of one table (:orange_tree) but still uses the original foreign key name (orange_tree_id). 
+
+class OrangeTree < AR::Base                    class Orange < AR::Base
+    has_many :oranges, foreign_key: tree           belongs_to :tree, class_name: "OrangeTree", foreign_key: :orange_tree_id
+end                                            end
+
+------------------                           ------------------
+|  orange_trees  |----------\                |   oranges      |
+|----------------|           \               |----------------|
+| id             |            \              | id             |
+|----------------|             \             |----------------|
+| age            |              \            | diameter       |
+|----------------|               \           |----------------|
+| height         |                -----------| orange_tree_id |
+|----------------|                           |----------------|
+
+
+=============================================================================================================
+
+Use has_many, through:, source: when the name of the table you are trying to get to (:seeds) on the join table model (Orange) has changed (to seedlings).
+
+
+class OrangeTree < AR::Base                  class Orange < AR::Base                      class Seed
+    has_many :oranges                            has_many seedlings, class_name: "Seed"       belongs_to :orange
+    has_many :seeds, through: :oranges,          belongs_to :orange_tree                  end
+    source: :seedlings                       end                                          
+end
+
+------------------                           ------------------                          ----------------
+|  orange_trees  |----------\                |    oranges     |                          |   seeds      |
+|----------------|           \               |----------------|                          |--------------|
+| id             |            \              | id             |------------\             | id           |
+|----------------|             \             |----------------|             \            |--------------|
+| age            |              \            | diameter       |              \---------- | orange_id    |
+|----------------|               \           |----------------|                          |--------------|
+| height         |                -----------| orange_tree_id |
+|----------------|                           |----------------|
