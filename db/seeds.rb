@@ -12,19 +12,25 @@ require 'csv'
 class LunchParser
   attr_reader :file
 
-  def initialize(file)
+  def initialize(file, year)
     @file = file
     @lunch_array = CSV.read(@file,{ :headers => true, :header_converters => :symbol })
     @lunch_array.each do |values|
-    	unless values[:Sponsor_EntityID] == nil
-      Lunch.create!(sponsor_id: values[:Sponsor_EntityID], sponsor_ctds: values[:Sponsor_CTDS], sponsor_name: values[:Sponsor_Name], site_id: values[:Site_EntityID], site_ctds: values[:Site_CTDS], site_name: values[:Site_Name], percentage_eligible: values[:Percent_Eligible_for_Meals], enrollment: values[:Total_Enrolled_as_of_Last_Day_in_October])
-   	 end
+    	# puts values.headers
+      unless values[:sponsor_entityid] == nil
+        Lunch.create!(sponsor_id: values[:sponsor_entityid], sponsor_ctds: values[:sponsor_ctds], sponsor_name: values[:sponsor_name], site_id: values[:site_entityid], site_ctds: values[:site_ctds], site_name: values[:site_name], percentage_eligible: values[:percent_eligible_for_meals], enrollment: values[:total_enrolled_as_of_last_day_in_october], school_year: year)
+      end
     end
   end
 end
 
-LunchParser.new("db/2010.csv")
-LunchParser.new("db/2011.csv")
-LunchParser.new("db/2012.csv")
-LunchParser.new("db/2013.csv")
-LunchParser.new("db/2014.csv")
+
+puts "WHat UPPP"
+
+# SHOULD REFACTOR TO BE DYNAMIC
+
+LunchParser.new("db/2010.csv", 2010)
+LunchParser.new("db/2011.csv", 2011)
+LunchParser.new("db/2012.csv", 2012)
+LunchParser.new("db/2013.csv", 2013)
+LunchParser.new("db/2014.csv", 2014)

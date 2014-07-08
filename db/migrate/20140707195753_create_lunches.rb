@@ -9,6 +9,7 @@ class CreateLunches < ActiveRecord::Migration
   		t.string :site_name
   		t.float :percentage_eligible
   		t.integer :enrollment
+  		t.integer :school_year
   		t.timestamps
   	end
   end
